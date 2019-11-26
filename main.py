@@ -3,65 +3,39 @@ import sys
 import pytesseract
 from PIL import Image, ImageTk
 import tkinter as tk
+from tkinter.filedialog import askopenfilename
 
+pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 
-if __name__ == '__main__':
-    if len(sys.argv) < 2:
-        print('Usage: python ocr_simple.py image.jpg')
-        sys.exit(1)
+# ///////////// GUI \\\\\\\\\\\\\\\\
+root = tk.Tk()
+config = ('-l tur --oem 1 --psm 3')
 
-    imPath = sys.argv[1]
-
-    # Define config parameters.
-    # '-l eng'  for using the English language
-    # '--oem 1' for using LSTM OCR Engine
-    config = ('-l tur --oem 1 --psm 3')
-
+def selector():
+    global root, imPath, scaled_image, img, img_width_percent,img_width, text, image
+    imPath = askopenfilename()
+    print(imPath)
     im = cv2.imread(imPath, cv2.IMREAD_COLOR)
-
     text = pytesseract.image_to_string(im, config=config)
 
-
-root = tk.Tk()
-############ IMAGE MANIPULATION AND ADDITION ################
-
-basewidth = 10
-image = Image.open(imPath)
-wpercent = (basewidth/float(image.size[0]))
-hsize = int((float(image.size[1])*float(wpercent)))
-img = image.resize((basewidth,hsize), Image.ANTIALIAS)
-photo = ImageTk.PhotoImage(image)
-
-# image = Image.open(imPath)
-# resize_image = image.resize((500,200),Image.ANTIALIAS)
-
-
-image1 = tk.Text(root, height=40, width=80)
-image1.insert(tk.END, '\n')
-image1.image_create(tk.END, image=photo)
-
-image1.pack(side=tk.LEFT)
-
-text2 = tk.Text(root, height=40, width=80)
-scroll = tk.Scrollbar(root, command=text2.yview)
-text2.configure(yscrollcommand=scroll.set)
-
-text2.tag_configure('bold_italics', font=('Arial', 15, 'bold', 'italic'))
-
-text2.tag_configure('big', font=('Verdana', 20, 'bold'))
-
-text2.tag_configure('color', font=('Tempus Sans ITC', 15))
+    img_width = 500
+    image = Image.open(imPath) # GORSEL BURADA ALINIYOR
+    img_width_percent = (img_width / float(image.size[0]))
+    img_height_size = int((float(image.size[1]) * float(img_width_percent)))
+    img = image.resize((img_width, img_height_size), Image.ANTIALIAS)
+    scaled_image = ImageTk.PhotoImage(img)
+    panel = tk.Label(root, image=scaled_image) # IMAGE BURADAN GELIYOR
+    panel.grid(row=0,column=0)
+    # image1 = tk.Label(root, image=scaled_image)
+    # image1.pack(side=tk.LEFT)
+    text2 = tk.Text(root, height=30, width=50)
+    text2.insert(tk.END, text)
+    text2.config(state="disabled",font=("Times New Roman",14))
+    text2.grid(row=0,column=1)
+    return imPath, scaled_image
 
 
-
-text2.insert(tk.END, text, 'color')
-text2.pack(side=tk.LEFT)
-scroll.pack(side=tk.RIGHT, fill=tk.Y)
+SelectButton = tk.Button(root, text="Dosya Seç", command=selector)
+SelectButton.grid(row=1,column=1)
 
 root.mainloop()
-
-
-
-
-
-    # print(text)
