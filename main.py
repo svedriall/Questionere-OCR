@@ -19,9 +19,11 @@ def selector():
     print(imPath)
     im = cv2.imread(imPath, cv2.IMREAD_COLOR)
     text = pytesseract.image_to_string(im, config=config) # ASIL İŞLENEN GÖRÜNTÜ BURADA
+    text_regex = text.replace("\n"," ")
+    text_regex = text_regex.replace("-", "")
 
     translator = Translator()
-    translations = translator.translate(text)
+    translations = translator.translate(text_regex)
 
     img_width = 500 # GÖRSELİN MAX GENİŞLİĞİ
     image = Image.open(imPath) # GORSEL BURADA ALINIYOR
@@ -42,7 +44,7 @@ def selector():
     panel.grid(row=1,column=0)
 
     text2 = tk.Text(root, height=30, width=70)
-    text2.insert(tk.END, text) # TEXT BURADA TK'YA INSERT EDILIYOR
+    text2.insert(tk.END, text_regex) # TEXT BURADA TK'YA INSERT EDILIYOR
     text2.config(state="disabled",font=("Times New Roman",14))
     text2.grid(row=1,column=1)
 
